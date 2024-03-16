@@ -1,0 +1,13 @@
+﻿.list-group-item.active {
+    color: white;
+    background-color: #212529;
+    border-color: #212529;
+}
+
+.container-main {
+    margin-top: 40px;
+}
+
+.hide-container {
+    margin-top: 80px;
+}

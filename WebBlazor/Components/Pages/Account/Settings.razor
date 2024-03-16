@@ -1,0 +1,50 @@
+﻿@page "/account/settings"
+@rendermode InteractiveServer
+
+<div class="container container-main">
+    <div class="row">
+        <NavAccount></NavAccount>
+
+        <div class="col-md-10">
+            <h3>User Settings</h3>
+
+            <EditForm Model="UserUpdateDto" FormName="UserUpdateForm">
+                <div class="mb-3">
+                    <label for="firstName" class="form-label">First Name</label>
+                    <InputText type="text" class="form-control" id="firstName" @bind-Value="UserUpdateDto.FirstName" />
+                </div>
+                <div class="mb-3">
+                    <label for="lastName" class="form-label">Last Name</label>
+                    <InputText type="text" class="form-control" id="lastName" @bind-Value="UserUpdateDto.LastName" />
+                </div>
+                <div class="mb-3">
+                    <label for="currentPassword" class="form-label">Current Password</label>
+                    <InputText type="password" class="form-control" id="currentPassword" @bind-Value="UserUpdateDto.CurrentPassword" />
+                </div>
+                <div class="mb-3">
+                    <label for="newPassword" class="form-label">New Password</label>
+                    <InputText type="password" class="form-control" id="newPassword" @bind-Value="UserUpdateDto.NewPassword" />
+                </div>
+
+                <button type="button" class="btn btn-dark" onclick="@(() => UpdateUser())">Update</button>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private UserUpdateDto UserUpdateDto = new UserUpdateDto();
+
+    protected override async Task OnInitializedAsync()
+    {
+        UserReadDto userModel = await UserService.HttpClient.GetFromJsonAsync<UserReadDto>($"{UserService.APIConnectionString}/users");
+        UserUpdateDto.FirstName = userModel.FirstName;
+        UserUpdateDto.LastName = userModel.LastName;
+    }
+
+    private async Task UpdateUser()
+    {
+        var response = await UserService.HttpClient.PutAsJsonAsync($"{UserService.APIConnectionString}/users", UserUpdateDto);
+        await MessageService.ShowMessage(response);
+    }
+}

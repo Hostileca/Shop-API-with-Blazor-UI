@@ -1,0 +1,34 @@
+﻿@using WebBlazor.Components.Pages.Forms
+@rendermode InteractiveServer
+
+<div class="container mt-5">
+    <h2 class="mb-4">Load category image</h2>
+    <EditForm OnSubmit="LoadImage" Model="ManufacturerImageLoadDto" FormName="ManufacturerLoadImageForm">
+        <div class="mb-3">
+            <label for="manufacturerId" class="form-label">Manufacturer id</label>
+            <InputText type="floatingInput" class="form-control" id="manufacturerId" placeholder="Manufaturer id" @bind-Value="ManufacturerImageLoadDto.Id" />
+        </div>
+        <div class="mb-3">
+            <label for="image" class="form-label">Image file</label>
+            <InputFile type="floatingInput" class="form-control" id="image" placeholder="File" @bind-Value="ManufacturerImageLoadDto.File" OnChange="HandleFileUpload" />
+        </div>
+        <button type="submit" class="btn btn-dark">Load</button>
+    </EditForm>
+</div>
+
+@code {
+    private ManufacturerImageLoadDto? ManufacturerImageLoadDto { get; set; } = new ManufacturerImageLoadDto();
+
+    private async Task LoadImage()
+    {
+        var content = new MultipartFormDataContent();
+        content.Add(new StreamContent(ManufacturerImageLoadDto.File.OpenReadStream()), "file", ManufacturerImageLoadDto.File.Name);
+        var response = await UserService.HttpClient.PostAsync($"{UserService.APIConnectionString}/manufacturers/{ManufacturerImageLoadDto.Id}/images", content);
+        await MessageService.ShowMessage(response);
+    }
+
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        ManufacturerImageLoadDto.File = e.File;
+    }
+}

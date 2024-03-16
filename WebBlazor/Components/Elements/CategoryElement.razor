@@ -1,0 +1,25 @@
+﻿@if (Category.CategoryImageId != 0)
+{
+    ImageSrc = $"{UserService.APIConnectionString}/categories/images/{Category.CategoryImageId}";
+}
+<button class="btn" id="@Category.Id" onclick="@(() => OnCardClick(Category.Id))">
+    <div class="col">
+        <img src="@ImageSrc" class="bd-placeholder-img card-img-top" width="100%" height="225" alt="@Category.Name">
+        <div class="card-body">
+            <h5 class="card-title">@Category.Name</h5>
+        </div>
+    </div>
+</button>
+
+@code {
+    [Parameter]
+    public CategoryReadDto Category { get; set; }
+
+    private string ImageSrc { get; set; }
+
+
+    private void OnCardClick(int categoryId)
+    {
+        NavigationManager.NavigateTo($"/categories/{categoryId}");
+    }
+}

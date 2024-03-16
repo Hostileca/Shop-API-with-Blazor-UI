@@ -1,0 +1,55 @@
+﻿@page "/account/card"
+@rendermode InteractiveServer
+
+<div class="container container-main">
+    <div class="row">
+        <NavAccount></NavAccount>
+
+        <div class="col-md-10">
+            @if (CardModel != null)
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Your Card</h4>
+                        <p class="card-text">Bonus Points: <span id="bonus-points">@CardModel.Bonuses</span></p>
+                        <p class="card-text">Phone number: <span id="bonus-points">@CardModel.PhoneNumber</span></p>
+                    </div>
+                    <div class="card-footer text-muted">
+                        @CardModel.RegistrationDate.ToString("yyyy-MM-dd");
+                    </div>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-danger btn-sm mt-2" onclick="@(() => UnbindCard())">Unbind Card</button>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-warning mt-3" role="alert">
+                    Your card is not bound. Please bind a card to view details.
+                </div>
+                <button type="button" class="btn btn-dark btn-sm mt-2" data-bs-toggle="modal" data-bs-target="#bindCardModal">Bind Card</button>
+            }
+        </div>
+    </div>
+</div>
+
+<WebBlazor.Components.Pages.Forms.Card.BindCardForm></WebBlazor.Components.Pages.Forms.Card.BindCardForm>
+
+@code {
+    private CardReadDto CardModel;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var response = await UserService.HttpClient.GetAsync($"{UserService.APIConnectionString}/users/buyer-cards");
+        if (response.IsSuccessStatusCode)
+        {
+            CardModel = await response.Content.ReadFromJsonAsync<CardReadDto>();
+        }
+    }
+
+    private async Task UnbindCard()
+    {
+        var response = await UserService.HttpClient.DeleteAsync($"{UserService.APIConnectionString}/users/unbind-card");
+        await MessageService.ShowMessage(response);
+    }
+}

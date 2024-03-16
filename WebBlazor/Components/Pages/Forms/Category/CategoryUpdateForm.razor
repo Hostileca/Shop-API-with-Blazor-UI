@@ -1,0 +1,28 @@
+﻿@using WebBlazor.Components.Pages.Forms
+@rendermode InteractiveServer
+
+<div class="container mt-5">
+    <h2 class="mb-4">Update category</h2>
+    <EditForm OnSubmit="UpdateCategory" Model="CategoryUpdateDto" FormName="CategoryUpdateForm">
+        <div class="mb-3">
+            <label for="categoryId" class="form-label">Category id</label>
+            <InputText type="floatingInput" class="form-control" id="categoryId" placeholder="Category id" @bind-Value="categoryId" />
+        </div>
+        <div class="mb-3">
+            <label for="categoryName" class="form-label">Category name</label>
+            <InputText type="floatingInput" class="form-control" id="categoryName" placeholder="Category" @bind-Value="CategoryUpdateDto.Name" />
+        </div>
+        <button type="submit" class="btn btn-dark">Update</button>
+    </EditForm>
+</div>
+
+@code {
+    private string categoryId;
+    private CategoryUpdateDto? CategoryUpdateDto { get; set; } = new CategoryUpdateDto();
+
+    private async Task UpdateCategory() 
+    {
+        var response = await UserService.HttpClient.PutAsJsonAsync<CategoryUpdateDto>($"{UserService.APIConnectionString}/categories/{categoryId}", CategoryUpdateDto);
+        await MessageService.ShowMessage(response);
+    }
+}

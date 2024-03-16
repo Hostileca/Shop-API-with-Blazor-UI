@@ -1,0 +1,56 @@
+﻿@page "/account/cart"
+@rendermode InteractiveServer
+
+<div class="container container-main">
+    <div class="row">
+        <NavAccount></NavAccount>
+
+        <div class="col-md-10">
+            <div class="album py-5 bg-light">
+                <div class="container">
+                    <div class="row row-cols-1 row-cols-md-4 g-3">
+                        @if (CartElements is not null)
+                        {
+                            foreach (var cartElement in CartElements)
+                            {
+                                <WebBlazor.Components.Elements.CartElement CartElementModel="cartElement"></WebBlazor.Components.Elements.CartElement>
+                            }
+
+                            @if (CartElements.Count > 0)
+                            {
+                                <div class="col-md-12 text-center">
+                                    <button class="btn btn-dark" onclick="@(() => PlaceOrder())">Place Order</button>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+@code {
+    private List<CartElementReadDto> CartElements;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!UserService.IsAuthorized)
+        {
+            NavigationManager.NavigateTo("/sign-in");
+            return;
+        }
+        CartElements = await UserService.HttpClient.GetFromJsonAsync<List<CartElementReadDto>>($"{UserService.APIConnectionString}/users/cart");
+    }
+
+    private async Task PlaceOrder()
+    {
+        var response = await UserService.HttpClient.PostAsync($"{UserService.APIConnectionString}/orders", null);
+        await MessageService.ShowMessage(response);
+        if (response.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("/account/orders");
+        }
+    }
+}

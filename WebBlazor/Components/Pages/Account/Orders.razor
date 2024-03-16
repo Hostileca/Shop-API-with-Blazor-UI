@@ -1,0 +1,41 @@
+﻿@page "/account/orders"
+@rendermode InteractiveServer
+
+<div class="container container-main">
+    <div class="row">
+        <NavAccount></NavAccount>
+
+        <div class="col-md-10">
+            <div class="album py-5 bg-light">
+                <div class="container">
+                    <div class="row row-cols-1 row-cols-md-4 g-3">
+                        @if (OrdersList is not null)
+                        {
+                            foreach (var order in OrdersList)
+                            {
+                                <WebBlazor.Components.Elements.OrderElement Order="order"></WebBlazor.Components.Elements.OrderElement>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+@code {
+    private List<OrderReadDto> OrdersList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!UserService.IsAuthorized)
+        {
+            NavigationManager.NavigateTo("/sign-in");
+            return;
+        }
+        OrdersList = await UserService.HttpClient.GetFromJsonAsync<List<OrderReadDto>>($"{UserService.APIConnectionString}/users/orders");
+    }
+}

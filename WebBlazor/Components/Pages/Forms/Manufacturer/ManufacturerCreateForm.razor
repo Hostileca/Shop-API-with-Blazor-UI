@@ -1,0 +1,23 @@
+﻿@using WebBlazor.Components.Pages.Forms
+@rendermode InteractiveServer
+
+<div class="container mt-5">
+    <h2 class="mb-4">Create manufacturer</h2>
+    <EditForm OnSubmit="CreateManufacturer" Model="ManufacturerCreateDto" FormName="ManufacturerCreateForm">
+        <div class="mb-3">
+            <label for="manufacturerName" class="form-label">Manufacturer name</label>
+            <InputText type="floatingInput" class="form-control" id="manufacturerName" placeholder="Manufacturer" @bind-Value="ManufacturerCreateDto.Name" />
+        </div>
+        <button type="submit" class="btn btn-dark">Create</button>
+    </EditForm>
+</div>
+
+@code {
+    private ManufacturerCreateDto? ManufacturerCreateDto { get; set; } = new ManufacturerCreateDto();
+
+    private async Task CreateManufacturer()
+    {
+        var response = await UserService.HttpClient.PostAsJsonAsync<ManufacturerCreateDto>($"{UserService.APIConnectionString}/manufacturers", ManufacturerCreateDto);
+        await MessageService.ShowMessage(response);
+    }
+}

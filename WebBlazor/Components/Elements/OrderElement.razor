@@ -1,0 +1,38 @@
+﻿<div class="col">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title">Order @Order.Id</h5>
+            <p class="card-text">Cost: @CalculateCost()</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <ul>
+                    @foreach (var product in Order.Products)
+                    {
+                        <li>
+                            <button class="btn" onclick="@(() => OnProductClick(product.Id))">@product.Name</button>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public OrderReadDto Order { get; set; }
+
+    public float CalculateCost()
+    {
+        float cost = 0;
+        foreach (var product in Order.Products)
+        {
+            cost += product.Price;
+        }
+        return cost;
+    }
+
+    private void OnProductClick(int productId)
+    {
+        NavigationManager.NavigateTo($"/products/{productId}");
+    }
+}

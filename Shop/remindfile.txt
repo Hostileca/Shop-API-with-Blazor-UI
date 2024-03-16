@@ -1,0 +1,3 @@
+dotnet ef database drop --verbose --project Shop.DAL --startup-project Shop
+dotnet ef database update --verbose --project Shop.DAL --startup-project Shop
+dotnet ef migrations add onCreate --verbose --project Shop.DAL --startup-project Shop

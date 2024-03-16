@@ -1,0 +1,26 @@
+﻿@page "/categories"
+@rendermode InteractiveServer
+
+<div class="album py-5 bg-light">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-md-6 g-3">
+
+            @if (categories is not null)
+            {
+                foreach (var category in categories)
+                {
+                    <WebBlazor.Components.Elements.CategoryElement Category="category"></WebBlazor.Components.Elements.CategoryElement>
+                }
+            }
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<CategoryReadDto> categories;
+    protected override async Task OnInitializedAsync()
+    {
+        categories = await UserService.HttpClient.GetFromJsonAsync<List<CategoryReadDto>>($"{UserService.APIConnectionString}/categories");
+    }
+}

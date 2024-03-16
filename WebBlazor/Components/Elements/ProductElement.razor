@@ -1,0 +1,47 @@
+﻿@if (ProductModel.ProductImageIds.Count > 0)
+{
+    ImageSrc = $"{UserService.APIConnectionString}/products/images/{ProductModel.ProductImageIds[0]}";
+}
+<div class="col">
+    <div class="card shadow-sm">
+        <img src="@ImageSrc" class="bd-placeholder-img card-img-top" width="100%" height="225" alt="product img">
+        <div class="card-body">
+            <h5 class="card-title">@ProductModel.Name</h5>
+            <p class="card-text">@ProductModel.Price</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="@(() => OnMoreClick())">More</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="@(() => OnInCartClick())">In cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ProductReadDto ProductModel { get; set; }
+
+    private string ImageSrc { get; set; }
+
+    private async Task OnInCartClick()
+    {
+        if (!UserService.IsAuthorized)
+        {
+            NavigationManager.NavigateTo($"/sign-in");
+            return;
+        }
+        var cartElementCreateDto = new CartElementCreateDto()
+            {
+                ProductId = ProductModel.Id,
+                Amount = 1
+            };
+        var response = await UserService.HttpClient.PostAsJsonAsync<CartElementCreateDto>($"{UserService.APIConnectionString}/users/cart", cartElementCreateDto);
+        await MessageService.ShowMessage(response);
+    } 
+
+    private void OnMoreClick()
+    {
+        NavigationManager.NavigateTo($"/products/{ProductModel.Id}");
+    }
+}

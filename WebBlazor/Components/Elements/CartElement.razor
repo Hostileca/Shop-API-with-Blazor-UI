@@ -1,0 +1,90 @@
+﻿@if (CartElementModel.Product.ProductImageIds.Count > 0)
+{
+    ImageSrc = $"{UserService.APIConnectionString}/products/images/{CartElementModel.Product.ProductImageIds[0]}";
+}
+<div class="col">
+    <div class="card shadow-sm">
+        <img src="@ImageSrc" class="bd-placeholder-img card-img-top" width="100%" height="225" alt="@CartElementModel.Product.Id">
+        <div class="card-body">
+            <h5 class="card-title">@CartElementModel.Product.Name</h5>
+            <p class="card-text">@CartElementModel.Product.Price</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="@(() => OnDecreaseClick())">-</button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="@(() => OnIncreaseClick())">+</button>
+                    <label class="form-control">@CartElementModel.Amount</label>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="@(() => OnDeleteClick())">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public CartElementReadDto CartElementModel { get; set; }
+    //private string CurrentAmount;
+
+    private string ImageSrc { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //CurrentAmount = CartElementModel.Amount.ToString();
+    }
+
+    // <InputText type="floatingInput" class="form-control" placeholder="Amount" @bind-Value="CurrentAmount" onchange="@(() => OnAmountChange())" />
+
+    // private async Task OnAmountChange()
+    // {
+    //     Console.WriteLine("test");
+    //     if (!Int32.TryParse(CurrentAmount, out int newAmount))
+    //     {
+    //         MessageService.ShowMessage(new Message()
+    //         {
+    //             Info = "Parse error",
+    //             Description = "Value can be only a number",
+    //             Type = MessagesType.Error
+    //         });
+    //     }
+    //     var cartElementUpdateDto = new CartElementUpdateDto();
+    //     cartElementUpdateDto.Amount = newAmount;
+
+    //     var response = await Http.PutAsJsonAsync<CartElementUpdateDto>($"http://localhost:5232/api/v1/users/cart/{CartElementModel.Product.Id}", cartElementUpdateDto);
+    //     if (response.IsSuccessStatusCode)
+    //     {
+    //         CartElementModel = await response.Content.ReadFromJsonAsync<CartElementReadDto>();
+    //     }
+    // }
+
+    private async Task OnDecreaseClick()
+    {
+        var cartElementUpdateDto = new CartElementUpdateDto();
+        cartElementUpdateDto.Amount = CartElementModel.Amount - 1;
+
+        var response = await UserService.HttpClient.PutAsJsonAsync<CartElementUpdateDto>($"{UserService.APIConnectionString}/users/cart/{CartElementModel.Product.Id}", cartElementUpdateDto);
+        if (response.IsSuccessStatusCode)
+        {
+            CartElementModel = await response.Content.ReadFromJsonAsync<CartElementReadDto>();
+        }
+    }
+
+    private async Task OnIncreaseClick()
+    {
+        var cartElementUpdateDto = new CartElementUpdateDto();
+        cartElementUpdateDto.Amount = CartElementModel.Amount + 1;
+
+        var response = await UserService.HttpClient.PutAsJsonAsync<CartElementUpdateDto>($"{UserService.APIConnectionString}/users/cart/{CartElementModel.Product.Id}", cartElementUpdateDto);
+        if (response.IsSuccessStatusCode)
+        {
+            CartElementModel = await response.Content.ReadFromJsonAsync<CartElementReadDto>();
+        }
+    }
+
+    private async Task OnDeleteClick()
+    {
+        var cartElementUpdateDto = new CartElementUpdateDto();
+        cartElementUpdateDto.Amount = CartElementModel.Amount + 1;
+
+        var response = await UserService.HttpClient.DeleteAsync($"{UserService.APIConnectionString}/users/cart/{CartElementModel.Product.Id}");
+    }
+}

@@ -1,0 +1,20 @@
+﻿@page "/account"
+@rendermode InteractiveServer
+
+<div class="container container-main">
+    <div class="row">
+        <NavAccount></NavAccount>
+
+        <h1>Welcome!</h1>
+    </div>
+</div>
+
+@code{
+    protected override async Task OnInitializedAsync()
+    {
+        if (!UserService.IsAuthorized)
+        {
+            NavigationManager.NavigateTo("/sign-in");
+        }
+    }
+}

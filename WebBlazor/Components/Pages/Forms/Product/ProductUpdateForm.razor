@@ -1,0 +1,40 @@
+﻿@using WebBlazor.Components.Pages.Forms
+@rendermode InteractiveServer
+
+<div class="container mt-5">
+    <h2 class="mb-4">Update category</h2>
+    <EditForm OnSubmit="UpdateProduct" Model="ProductUpdateDto" FormName="ProductUpdateForm">
+        <div class="mb-3">
+            <label for="productId" class="form-label">Product id</label>
+            <InputText type="floatingInput" class="form-control" id="productId" placeholder="Product id" @bind-Value="productId" />
+        </div>
+        <div class="mb-3">
+            <label for="productName" class="form-label">Product name</label>
+            <InputText type="floatingInput" class="form-control" id="productName" placeholder="Product name" @bind-Value="ProductUpdateDto.Name" />
+        </div>
+        <div class="mb-3">
+            <label for="productDescription" class="form-label">Product description</label>
+            <InputTextArea type="floatingInput" class="form-control" id="productDescription" placeholder="Product description" @bind-Value="ProductUpdateDto.Description" />
+        </div>
+        <div class="mb-3">
+            <label for="categoryId" class="form-label">Category id</label>
+            <InputText type="floatingInput" class="form-control" id="categoryId" placeholder="Category id" @bind-Value="ProductUpdateDto.CategoryId" />
+        </div>
+        <div class="mb-3">
+            <label for="manufacturerId" class="form-label">Manufacturer id</label>
+            <InputText type="floatingInput" class="form-control" id="manufacturerId" placeholder="Manufacturer id" @bind-Value="ProductUpdateDto.ManufacturerId" />
+        </div>
+        <button type="submit" class="btn btn-dark">Update</button>
+    </EditForm>
+</div>
+
+@code {
+    private string productId;
+    private ProductUpdateDto ProductUpdateDto { get; set; } = new ProductUpdateDto();
+
+    private async Task UpdateProduct() 
+    {
+        var response = await UserService.HttpClient.PutAsJsonAsync<ProductUpdateDto>($"{UserService.APIConnectionString}/products/{productId}", ProductUpdateDto);
+        await MessageService.ShowMessage(response);
+    }
+}

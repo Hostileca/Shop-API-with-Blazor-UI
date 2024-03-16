@@ -1,0 +1,23 @@
+﻿@using WebBlazor.Components.Pages.Forms
+@rendermode InteractiveServer
+
+<div class="container mt-5">
+    <h2 class="mb-4">Delete product image</h2>
+    <EditForm OnSubmit="DeleteImage" Model="ProductImageLoadDto" FormName="ProductLoadImageForm">
+        <div class="mb-3">
+            <label for="imageId" class="form-label">Image id</label>
+            <InputText type="floatingInput" class="form-control" id="imageId" placeholder="Image id" @bind-Value="ProductImageLoadDto.Id" />
+        </div>
+        <button type="submit" class="btn btn-dark">Delete</button>
+    </EditForm>
+</div>
+
+@code {
+    private ProductImageLoadDto? ProductImageLoadDto { get; set; } = new ProductImageLoadDto();
+
+    private async Task DeleteImage()
+    {
+        var response = await UserService.HttpClient.DeleteAsync($"{UserService.APIConnectionString}/products/images/{ProductImageLoadDto.Id}");
+        await MessageService.ShowMessage(response);
+    }
+}

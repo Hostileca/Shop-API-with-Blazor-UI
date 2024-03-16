@@ -1,0 +1,29 @@
+﻿<div class="col-md-2">
+    <div class="list-group">
+        <NavLink href="/account/cart" class="list-group-item list-group-item-action" Match="NavLinkMatch.All">Cart</NavLink>
+        <NavLink href="/account/orders" class="list-group-item list-group-item-action" Match="NavLinkMatch.All">Orders</NavLink>
+        <NavLink href="/account/card" class="list-group-item list-group-item-action" Match="NavLinkMatch.All">Card</NavLink>
+        <NavLink href="/account/settings" class="list-group-item list-group-item-action" Match="NavLinkMatch.All">Settings</NavLink>
+        <button type="button" class="list-group-item list-group-item-action list-group-item-danger" onclick="@(() => Logout())">Logout</button>
+
+        @if (IsRoot)
+        {
+            <div class="hide-container">
+                <NavLink href="/admin" class="list-group-item list-group-item-action list-group-item-primary">Admin</NavLink>
+            </div>
+        }
+    </div>
+</div>
+
+@code{
+    private bool IsRoot = false;
+    protected override async Task OnInitializedAsync()
+    {
+        IsRoot = UserService.IsTokenHasRole(Roles.root);
+    }
+
+    private void Logout(){
+        UserService.Token = null;
+        NavigationManager.NavigateTo("/sign-in");
+    }
+}

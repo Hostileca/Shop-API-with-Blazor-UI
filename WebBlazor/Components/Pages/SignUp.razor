@@ -1,0 +1,53 @@
+﻿@page "/sign-up"
+@rendermode InteractiveServer
+
+<div class="form-signin text-center">
+    <EditForm OnSubmit="Register" Model="AuthModel" FormName="SignUpForm">
+        <!-- <img class="mb-4" src="../assets/brand/bootstrap-logo.svg" alt="" width="72" height="57"> -->
+        <h1 class="h3 mb-3 fw-normal">Sign up</h1>
+
+        <div class="form-floating">
+            <InputText type="floatingInput" class="form-control" id="username" placeholder="Username" @bind-Value="AuthModel.Username" />
+            <label for="username">Username</label>
+        </div>
+        <div class="form-floating">
+            <InputText type="floatingPassword" class="form-control" id="password" placeholder="Password" @bind-Value="AuthModel.Password" />
+            <label for="password">Password</label>
+        </div>
+        <button class="w-100 btn btn-lg btn-dark" type="submit">Sign in</button>
+    </EditForm>
+    <p class="mt-3">Already have an account? <NavLink href="/sign-in">Sign in</NavLink></p>
+</div>
+
+@code {
+    private AuthModel? AuthModel { get; set; } = new AuthModel();
+    private TokenResponse token = new TokenResponse();
+
+    private async Task Register()
+    {
+        var response = await UserService.HttpClient.PostAsJsonAsync<AuthModel>($"{UserService.APIConnectionString}/users/registration", AuthModel);
+        if (response.IsSuccessStatusCode)
+        {
+            token = await response.Content.ReadFromJsonAsync<TokenResponse>();
+            UserService.Token = token.Token;
+            NavigationManager.NavigateTo("/account");
+            MessageService.ShowMessage(new Message()
+                {
+                    Info = response.StatusCode.ToString(),
+                    Description = "Authorized",
+                    Type = MessagesType.Success
+                });
+
+        }
+        else
+        {
+            var error = await response.Content.ReadFromJsonAsync<ErrorResponse>();
+            MessageService.ShowMessage(new Message()
+                {
+                    Info = error.Message,
+                    Description = error.Error,
+                    Type = MessagesType.Error
+                });
+        }
+    }
+}

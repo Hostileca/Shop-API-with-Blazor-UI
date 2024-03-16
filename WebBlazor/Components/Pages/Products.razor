@@ -1,0 +1,26 @@
+﻿@page "/products"
+@rendermode InteractiveServer
+
+<div class="album py-5 bg-light">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-md-5 g-3">
+
+            @if (products is not null)
+            {
+                foreach (var product in products)
+                {
+                    <WebBlazor.Components.Elements.ProductElement ProductModel="product"></WebBlazor.Components.Elements.ProductElement>
+                }
+            }
+
+        </div>
+    </div>
+</div>
+
+@code{
+    private List<ProductReadDto> products;
+    protected override async Task OnInitializedAsync()
+    {
+        products = await UserService.HttpClient.GetFromJsonAsync<List<ProductReadDto>>($"{UserService.APIConnectionString}/products");
+    }
+}

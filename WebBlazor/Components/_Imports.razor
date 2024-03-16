@@ -1,0 +1,29 @@
+﻿@using System.Net.Http
+@using System.Net.Http.Json
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using static Microsoft.AspNetCore.Components.Web.RenderMode
+@using Microsoft.AspNetCore.Components.Web.Virtualization
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using Microsoft.JSInterop
+@using WebBlazor
+@using WebBlazor.Components
+
+@using Models
+@using Models.Dtos.Category
+@using Models.Dtos.Manufacturer
+@using Models.Dtos.Attribute
+@using Models.Dtos.Product
+@using Models.Dtos.Card
+@using Models.Dtos.Price
+@using Models.Dtos.Cart
+@using Models.Dtos.Order
+@using Models.Dtos.User
+@using Models.Dtos.Review
+@using Service
+
+
+@inject NavigationManager NavigationManager
+@inject UserService UserService
+@inject MessagesService MessageService
