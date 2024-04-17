@@ -1,6 +1,6 @@
-﻿using Shop.BL.Dtos.Product;
+﻿using WebBlazor.Models.Dtos.Product;
 
-namespace Shop.BL.Dtos.Manufacturer
+namespace WebBlazor.Models.Dtos.Manufacturer
 {
     public class ManufacturerDetailedReadDto
     {

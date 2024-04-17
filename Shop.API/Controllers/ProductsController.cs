@@ -52,5 +52,12 @@ namespace Shop.API.Controllers
             var product = await _productsService.UpdateProduct(id, productUpdateDto);
             return Ok(product);
         }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchProducts(string searchText)
+        {
+            var products = await _productsService.SearchProducts(searchText);
+            return Ok(products);
+        }
     }
 }

@@ -1,0 +1,172 @@
+﻿<div class="row">
+    
+
+    <div class="col-md-6">
+        <div class="col-md-6">
+            <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                    @if(ProductModel.ProductImageIds.Count == 0)
+                    {
+                        <p>No images</p>
+                    }
+                    @foreach (var imgId in ProductModel.ProductImageIds)
+                    {
+                        <div class="carousel-item @(imgId == ProductModel.ProductImageIds.First() ? "active" : "")">
+                            <img src="@($"{UserService.APIConnectionString}/products/images/{imgId}")" class="d-block w-100" alt="@imgId">
+                            <button type="button" class="btn btn-danger btn-sm" onclick="@(() => RemoveImage(imgId))">Delete image</button>
+                        </div>
+                    }
+                </div>
+                <button class="btn btn-dark" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">Prev image</button>
+                <button class="btn btn-dark" type="button" data-bs-target="#productCarousel" data-bs-slide="next">Next image</button>
+            </div>
+            <div class="mt-3">
+                <label for="image" class="form-label">Image file</label>
+                <InputFile type="floatingInput" class="form-control" id="image" placeholder="File" @bind-Value="File" OnChange="HandleFileUpload" />
+                <button type="submit" class="btn btn-dark" onclick="@(() => LoadFile())">Load</button>
+            </div>
+        </div>
+
+        <label>Name:</label>
+        <InputText class="form-control" @bind-Value="ProductUpdateDto.Name"></InputText>
+
+        <label>Description:</label>
+        <InputText class="form-control" @bind-Value="ProductUpdateDto.Description"></InputText>
+
+        <label>Category id:</label>
+        <InputText class="form-control" @bind-Value="ProductUpdateDto.CategoryId"></InputText>
+
+        <label>Manufacturer id:</label>
+        <InputText class="form-control" @bind-Value="ProductUpdateDto.ManufacturerId"></InputText>
+
+        <button class="btn btn-dark" onclick="@(() => SaveProductInfo())">Save</button>
+
+        <h3>Attributes:</h3>
+        <ul>
+            @foreach (var attributeElement in ProductModel.Attributes)
+            {
+                <li>@attributeElement.Name: @attributeElement.Value</li>
+                <button type="button" class="btn btn-danger btn-sm" onclick="@(() => RemoveAttribute(attributeElement))">Delete</button>
+            }
+        </ul>
+        <label>Attribute name:</label>
+        <InputText class="form-control" @bind-Value="AttributeCreateDto.Name"></InputText>
+
+        <label>Attribute value:</label>
+        <InputText class="form-control" @bind-Value="AttributeCreateDto.Value"></InputText>
+
+        <button class="btn btn-dark" onclick="@(() => AddAttribute())">Add new attribute</button>
+
+        <h3>Price history:</h3>
+        @foreach (var price in ProductModel.PriceHistory)
+        {
+            <p>
+                @price.StartDate.ToString("yyyy-MM-dd") -
+                @if (price.EndDate == DateTime.MinValue)
+                {
+                    <text>today</text>
+                }
+                else
+                {
+                    @price.EndDate.ToString("yyyy-MM-dd")
+                }
+                : @price.PriceValue
+            </p>
+        }
+
+        <label>New price:</label>
+        <InputText class="form-control" @bind-Value="PriceUpdateDto.PriceValue"></InputText>
+        <button class="btn btn-dark" onclick="@(() => UpdatePrice())">Update price</button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ProductDetailedReadDto ProductModel { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ProductUpdateDto.Name = ProductModel.Name;
+        ProductUpdateDto.Description = ProductModel.Description;
+        ProductUpdateDto.CategoryId = ProductModel.Category.Id.ToString();
+        ProductUpdateDto.ManufacturerId = ProductModel.Manufacturer.Id.ToString();
+    }
+
+    private ProductUpdateDto ProductUpdateDto = new ProductUpdateDto();
+    private async Task SaveProductInfo()
+    {
+        var response = await UserService.HttpClient.PutAsJsonAsync<ProductUpdateDto>($"{UserService.APIConnectionString}/products/{ProductModel.Id}", ProductUpdateDto);
+        if (response.IsSuccessStatusCode)
+        {
+            ProductModel = await response.Content.ReadFromJsonAsync<ProductDetailedReadDto>();
+        }
+        await MessageService.ShowMessage(response);
+    }
+
+    private ProductAttributeCreateDto AttributeCreateDto = new ProductAttributeCreateDto();
+    private async Task AddAttribute()
+    {
+        var response = await UserService.HttpClient.PostAsJsonAsync<ProductAttributeCreateDto>($"{UserService.APIConnectionString}/products/{ProductModel.Id}/attributes", AttributeCreateDto);
+        if (response.IsSuccessStatusCode)
+        {
+            ProductModel.Attributes.Add(await response.Content.ReadFromJsonAsync<ProductAttributeReadDto>());
+        }
+        await MessageService.ShowMessage(response);
+
+    }
+
+    private PriceUpdateDto PriceUpdateDto = new PriceUpdateDto();
+    private async Task UpdatePrice()
+    {
+        var response = await UserService.HttpClient.PutAsJsonAsync<PriceUpdateDto>($"{UserService.APIConnectionString}/products/{ProductModel.Id}/prices", PriceUpdateDto);
+        if (response.IsSuccessStatusCode)
+        {
+            ProductModel.PriceHistory.Add(await response.Content.ReadFromJsonAsync<PriceReadDto>());
+            StateHasChanged();
+        }
+        await MessageService.ShowMessage(response);
+    }
+
+    private IBrowserFile File;
+    private async Task LoadFile()
+    {
+        if(File == null)
+        {
+            return;
+        }
+        var content = new MultipartFormDataContent();
+        content.Add(new StreamContent(File.OpenReadStream()), "file", File.Name);
+        var response = await UserService.HttpClient.PostAsync($"{UserService.APIConnectionString}/products/{ProductModel.Id}/images", content);
+        if (response.IsSuccessStatusCode)
+        {
+            ProductModel.ProductImageIds.Add(await response.Content.ReadFromJsonAsync<int>());
+            StateHasChanged();
+        }
+        await MessageService.ShowMessage(response);
+    }
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        File = e.File;
+    }
+
+    private async Task RemoveAttribute(ProductAttributeReadDto productAttribute)
+    {
+        var response = await UserService.HttpClient.DeleteAsync($"{UserService.APIConnectionString}/products/{ProductModel.Id}/attributes/{productAttribute.AttributeId}");
+        await MessageService.ShowMessage(response);
+        if (response.IsSuccessStatusCode)
+        {
+            ProductModel.Attributes.Remove(productAttribute);
+            StateHasChanged();
+        }
+    }
+    private async Task RemoveImage(int id)
+    {
+        var response = await UserService.HttpClient.DeleteAsync($"{UserService.APIConnectionString}/products/images/{id}");
+        if (response.IsSuccessStatusCode)
+        {
+            ProductModel.ProductImageIds.Remove(id);
+            StateHasChanged();
+        }
+        await MessageService.ShowMessage(response);
+    }
+}

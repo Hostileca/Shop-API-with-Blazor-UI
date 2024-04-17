@@ -41,6 +41,7 @@ namespace WebBlazor.Service
 
         public bool IsTokenHasRole(Roles role)
         {
+            if(Token == null) { return false; }
             var jwt = new JwtSecurityTokenHandler().ReadJwtToken(_token);
             var claimForCheck = new Claim(ClaimTypes.Role, role.ToString());
             var result = jwt.Claims.FirstOrDefault(c => c.Type == claimForCheck.Type && c.Value == claimForCheck.Value);

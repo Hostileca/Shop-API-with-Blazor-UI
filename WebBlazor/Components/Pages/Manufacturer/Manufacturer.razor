@@ -1,0 +1,80 @@
+﻿@page "/manufacturers/{manufacturerId}"
+@rendermode InteractiveServer
+
+<div class="container mt-5">
+    @if (ManufacturerModel != null)
+    {
+        @switch (Mode)
+        {
+            case Modes.Read:
+                <ManufacturerReadMode ManufacturerModel="ManufacturerModel"></ManufacturerReadMode>
+                break;
+            case Modes.Edit:
+                <ManufacturerEditMode ManufacturerModel="ManufacturerModel"></ManufacturerEditMode>
+                break;
+            default:
+                break;
+        }
+
+        @if (UserService.IsTokenHasRole(Roles.root))
+        {
+            <div class="mt-4">
+                <button class="btn btn-primary" onclick="@(() => SwitchMode())">@GetNextMode()</button>
+                <button class="btn btn-danger" onclick="@(() => RemoveManufacturer())">Delete manufacturer</button>
+            </div>
+        }
+    }
+    else
+    {
+
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string manufacturerId { get; set; }
+    private Modes Mode = Modes.Read;
+
+    public ManufacturerDetailedReadDto ManufacturerModel { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        ManufacturerModel = await UserService.HttpClient.GetFromJsonAsync<ManufacturerDetailedReadDto>($"{UserService.APIConnectionString}/manufacturers/{manufacturerId}");
+    }
+
+    private void SwitchMode()
+    {
+        switch (Mode)
+        {
+            case Modes.Read:
+                Mode = Modes.Edit;
+                break;
+            case Modes.Edit:
+                Mode = Modes.Read;
+                break;
+            default:
+                break;
+        }
+    }
+
+    private Modes GetNextMode()
+    {
+        switch (Mode)
+        {
+            case Modes.Read:
+                return Modes.Edit;
+            case Modes.Edit:
+                return Modes.Read;
+        }
+        return Modes.Read;
+    }
+
+    private async Task RemoveManufacturer()
+    {
+        var response = await UserService.HttpClient.DeleteAsync($"{UserService.APIConnectionString}/manufacturers/{ManufacturerModel.Id}");
+        if (response.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("/manufacturers");     
+        }
+        await MessageService.ShowMessage(response);
+    }
+}

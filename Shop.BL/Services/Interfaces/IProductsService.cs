@@ -9,6 +9,6 @@ namespace Shop.BL.Services.Interfaces
         Task<ProductDetailedReadDto> CreateProduct(ProductCreateDto productCreateDto);
         Task<ProductDetailedReadDto> DeleteProduct(int id);
         Task<ProductDetailedReadDto> UpdateProduct(int productId, ProductUpdateDto productUpdateDto);
-
+        Task<IEnumerable<ProductReadDto>> SearchProducts(string searchText);
     }
 }

@@ -10,5 +10,6 @@ namespace Shop.DAL.Data.Interfaces
         void DeleteCategory(Category category);
         Task<Category> GetCategoryById(int id);
         Task<Category> GetCategoryByName(string name);
+        Task<IEnumerable<Category>> SearchByName(string searchName);
     }
 }

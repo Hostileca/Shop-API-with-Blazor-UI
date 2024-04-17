@@ -36,8 +36,8 @@ namespace Shop.API.Controllers
         public async Task<IActionResult> CreateOrder()
         {
             var userName = User.FindFirst(ClaimTypes.Name)?.Value;
-            var order = await _ordersService.CreateOrder(userName);
-            return Ok(order);
+            var orders = await _ordersService.CreateOrder(userName);
+            return Ok(orders);
         }
 
         [HttpDelete("{id}")]

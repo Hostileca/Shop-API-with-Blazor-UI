@@ -58,6 +58,12 @@ namespace Shop.BL.Services.Implementation
             return _mapper.Map<ManufacturerDetailedReadDto>(manufacturer);
         }
 
+        public async Task<IEnumerable<ManufacturerReadDto>> SearchManufacturers(string searchText)
+        {
+            var manufacturers = await _manufacturersRepo.SearchByName(searchText);
+            return _mapper.Map<IEnumerable<ManufacturerReadDto>>(manufacturers);
+        }
+
         public async Task<ManufacturerDetailedReadDto> UpdateManufacturer(int id, ManufacturerUpdateDto manufacturerUpdateDto)
         {
             var manufacturerFromRepo = await _manufacturersRepo.GetManufacturerById(id);

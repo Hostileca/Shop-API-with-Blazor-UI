@@ -52,7 +52,7 @@ namespace Shop.BL.Services.Implementation
             return fileBytes;
         }
 
-        public async Task<string> UploadProductImage(int productId, IFormFile file)
+        public async Task<int> UploadProductImage(int productId, IFormFile file)
         {
             var product = await _productsRepo.GetProductById(productId);
 
@@ -64,16 +64,17 @@ namespace Shop.BL.Services.Implementation
             var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
             var filePath = Path.Combine(_productsDirectoryPath, fileName);
             await UploadFile(filePath, file);
-            await _filesRepo.AddProductImage(new ProductImage
+            var fileModel = new ProductImage
             {
                 Product = product,
                 FilePath = filePath
-            });
+            };
+            await _filesRepo.AddProductImage(fileModel);
             await _filesRepo.SaveChanges();
-            return filePath;
+            return fileModel.Id;
         }
 
-        public async Task<string> UploadCategoryImage(int categoryId, IFormFile file)
+        public async Task<int> UploadCategoryImage(int categoryId, IFormFile file)
         {
             var category = await _categoryRepo.GetCategoryById(categoryId);
 
@@ -85,16 +86,17 @@ namespace Shop.BL.Services.Implementation
             var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
             var filePath = Path.Combine(_categoriesDirectoryPath, fileName);
             await UploadFile(filePath, file);
-            await _filesRepo.AddCategoryImage(new CategoryImage
+            var fileModel = new CategoryImage
             {
                 Category = category,
                 FilePath = filePath
-            });
+            };
+            await _filesRepo.AddCategoryImage(fileModel);
             await _filesRepo.SaveChanges();
-            return filePath;
+            return fileModel.Id;
         }
 
-        public async Task<string> UploadManufacturerImage(int manufacturerId, IFormFile file)
+        public async Task<int> UploadManufacturerImage(int manufacturerId, IFormFile file)
         {
             var manufacturer = await _manufacturersRepo.GetManufacturerById(manufacturerId);
 
@@ -106,13 +108,14 @@ namespace Shop.BL.Services.Implementation
             var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
             var filePath = Path.Combine(_manufacturersDirectoryPath, fileName);
             await UploadFile(filePath, file);
-            await _filesRepo.AddManufactuerImage(new ManufacturerImage
+            var fileModel = new ManufacturerImage
             {
                 Manufacturer = manufacturer,
                 FilePath = filePath
-            });
+            };
+            await _filesRepo.AddManufactuerImage(fileModel);
             await _filesRepo.SaveChanges();
-            return filePath;
+            return fileModel.Id;
         }
 
         public async Task<byte[]> GetCategoryImageById(int imageId)

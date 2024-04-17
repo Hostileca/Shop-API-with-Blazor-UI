@@ -59,14 +59,19 @@ namespace Shop.BL.Profiles
                     opt => opt.MapFrom(src => src.Image));
 
             CreateMap<ManufacturerCreateDto, Manufacturer>();
+            CreateMap<ManufacturerUpdateDto, Manufacturer>();
             CreateMap<Manufacturer, ManufacturerReadDto>()
                 .ForMember(manufacturerReadDto => manufacturerReadDto.ManufacturerImageId,
                     opt => opt.MapFrom(src => src.Image));
 
-            CreateMap<Manufacturer, ManufacturerDetailedReadDto>();
+            CreateMap<Manufacturer, ManufacturerDetailedReadDto>()
+                .ForMember(categoryDetailedReadDto => categoryDetailedReadDto.ManufacturerImageId,
+                    opt => opt.MapFrom(src => src.Image));
 
             CreateMap<Order, OrderReadDto>()
-                .ForMember(orderReadDto => orderReadDto.Products, opt => opt.MapFrom(src => src.OrderProduct.Select(op => op.Product)));
+                .ForMember(orderReadDto => orderReadDto.Products,
+                    opt => opt.MapFrom(src => src.OrderProduct));
+            CreateMap<OrderProduct, OrderProductReadDto>();
 
             CreateMap<UserRegisterDto, User>();
             CreateMap<User, UserReadDto>();
@@ -80,6 +85,7 @@ namespace Shop.BL.Profiles
 
             CreateMap<PriceCreateDto, Price>();
             CreateMap<Price, PriceReadDto>();
+            CreateMap<PriceUpdateDto, Price>();
 
             CreateMap<CartElementCreateDto, CartElement>();
             CreateMap<CartElement, CartElementReadDto>();

@@ -1,0 +1,19 @@
+﻿<button class="btn" id="@Manufacturer.Id" onclick="@(() => OnCardClick())">
+    <div class="col">
+        <img src=@($"{UserService.APIConnectionString}/manufacturers/images/{Manufacturer.ManufacturerImageId}")
+             class="bd-placeholder-img card-img-top" width="100%" height="225" alt="@Manufacturer.Name">
+        <div class="card-body">
+            <h5 class="card-title">@Manufacturer.Name</h5>
+        </div>
+    </div>
+</button>
+
+@code {
+    [Parameter]
+    public ManufacturerReadDto Manufacturer { get; set; }
+
+    private void OnCardClick()
+    {
+        NavigationManager.NavigateTo($"/manufacturers/{Manufacturer.Id}");
+    }
+}

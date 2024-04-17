@@ -1,5 +1,4 @@
 using WebBlazor.Components;
-using WebBlazor.Components.Pages.Forms;
 using WebBlazor.Service;
 
 namespace WebBlazor
@@ -14,7 +13,6 @@ namespace WebBlazor
                 .AddInteractiveServerComponents();
 
             builder.Services.AddHttpClient();
-            builder.Services.AddScoped<FormService>();
             builder.Services.AddSingleton<UserService>();
             builder.Services.AddSingleton<MessagesService>();
 

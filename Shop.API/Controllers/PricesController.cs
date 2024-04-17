@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Shop.BL.Dtos.Price;
 using Shop.BL.Services.Interfaces;
 
@@ -26,6 +27,7 @@ namespace Shop.API.Controllers
             return Ok(await _priceHistoryService.GetProductPriceHistory(productId));
         }
 
+        [Authorize(Roles = "root")]
         [HttpPut]
         public async Task<IActionResult> UpdateProductPrice(int productId, PriceUpdateDto priceUpdateDto)
         {

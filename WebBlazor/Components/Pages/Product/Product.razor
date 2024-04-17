@@ -1,0 +1,80 @@
+﻿@page "/products/{productId}"
+@rendermode InteractiveServer
+
+<div class="container mt-5">
+    @if (ProductModel != null)
+    {
+        @switch (Mode)
+        {
+            case Modes.Read:
+                <ProductReadMode ProductModel="ProductModel"></ProductReadMode>
+                break;
+            case Modes.Edit:
+                <ProductEditMode ProductModel="ProductModel"></ProductEditMode>
+                break;
+            default:
+                break;
+        }
+
+        @if (UserService.IsTokenHasRole(Roles.root))
+        {
+            <div class="mt-4">
+                <button class="btn btn-primary" onclick="@(() => SwitchMode())">@GetNextMode()</button>
+                <button class="btn btn-danger" onclick="@(() => RemoveProduct())">Delete product</button>
+            </div>
+        }
+    }
+    else
+    {
+
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string productId { get; set; }
+    private Modes Mode = Modes.Read;
+
+    public ProductDetailedReadDto ProductModel { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        ProductModel = await UserService.HttpClient.GetFromJsonAsync<ProductDetailedReadDto>($"{UserService.APIConnectionString}/products/{productId}");
+    }
+
+    private void SwitchMode()
+    {
+        switch (Mode)
+        {
+            case Modes.Read:
+                Mode = Modes.Edit;
+                break;
+            case Modes.Edit:
+                Mode = Modes.Read;
+                break;
+            default:
+                break;
+        }
+    }
+
+    private Modes GetNextMode()
+    {
+        switch (Mode)
+        {
+            case Modes.Read:
+                return Modes.Edit;
+            case Modes.Edit:
+                return Modes.Read;
+        }
+        return Modes.Read;
+    }
+
+    private async Task RemoveProduct()
+    {
+        var response = await UserService.HttpClient.DeleteAsync($"{UserService.APIConnectionString}/products/{ProductModel.Id}");
+        if (response.IsSuccessStatusCode)
+        {
+            NavigationManager.NavigateTo("/products");
+        }
+        await MessageService.ShowMessage(response);
+    }
+}

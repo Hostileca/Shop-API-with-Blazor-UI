@@ -5,10 +5,10 @@
             <p class="card-text">Cost: @CalculateCost()</p>
             <div class="d-flex justify-content-between align-items-center">
                 <ul>
-                    @foreach (var product in Order.Products)
+                    @foreach (var orderProduct in Order.Products)
                     {
                         <li>
-                            <button class="btn" onclick="@(() => OnProductClick(product.Id))">@product.Name</button>
+                            <button class="btn" onclick="@(() => OnProductClick(orderProduct.Product.Id))">@orderProduct.Product.Name</button>
                         </li>
                     }
                 </ul>
@@ -24,9 +24,9 @@
     public float CalculateCost()
     {
         float cost = 0;
-        foreach (var product in Order.Products)
+        foreach (var orderProduct in Order.Products)
         {
-            cost += product.Price;
+            cost += orderProduct.Product.Price * orderProduct.Amount;
         }
         return cost;
     }

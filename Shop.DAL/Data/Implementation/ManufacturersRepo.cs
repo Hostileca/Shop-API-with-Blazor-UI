@@ -47,5 +47,16 @@ namespace Shop.DAL.Data.Implementation
         {
             await _dbContext.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<Manufacturer>> SearchByName(string searchName)
+        {
+            var searchText = searchName.ToLower();
+            var manufacturers = await _dbContext.Manufacturers
+            .Where(p => p.Name.ToLower().Contains(searchText))
+                .Include(m => m.Products).ThenInclude(p => p.Category)
+                .Include(m => m.Image)
+            .ToListAsync();
+            return manufacturers;
+        }
     }
 }

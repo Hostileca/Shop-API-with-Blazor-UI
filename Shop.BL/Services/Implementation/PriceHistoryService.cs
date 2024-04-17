@@ -15,6 +15,7 @@ namespace Shop.BL.Services.Implementation
             _priceHistoryRepo = priceHistoryRepo;
             _mapper = mapper;
         }
+
         public async Task<PriceReadDto> GetProductCurrentPrice(int productId)
         {
             var price = await _priceHistoryRepo.GetCurrentPrice(productId);
@@ -30,9 +31,12 @@ namespace Shop.BL.Services.Implementation
         public async Task<PriceReadDto> UpdateProductPrice(int productId, PriceUpdateDto priceUpdateDto)
         {
             var price = await _priceHistoryRepo.GetCurrentPrice(productId);
-            var newPrice = _mapper.Map<Price>(priceUpdateDto);
-            await _priceHistoryRepo.AddProductPrice(newPrice);
             price.EndDate = DateTime.UtcNow;
+            var newPrice = _mapper.Map<Price>(priceUpdateDto);
+            newPrice.StartDate = DateTime.Now;
+            newPrice.Product = price.Product;
+            await _priceHistoryRepo.AddProductPrice(newPrice);
+            await _priceHistoryRepo.SaveChanges();
             return _mapper.Map<PriceReadDto>(newPrice);
         }
     }

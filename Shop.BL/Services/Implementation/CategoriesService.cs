@@ -60,6 +60,10 @@ namespace Shop.BL.Services.Implementation
 
         public async Task<CategoryDetailedReadDto> UpdateCategory(int id, CategoryUpdateDto categoryUpdateDto)
         {
+            if (await _categoriesRepo.GetCategoryByName(categoryUpdateDto.Name) is not null)
+            {
+                throw new DuplicateNameException($"Category {categoryUpdateDto.Name} already exists");
+            }
             var category = await _categoriesRepo.GetCategoryById(id);
             if (category == null)
             {
@@ -68,6 +72,12 @@ namespace Shop.BL.Services.Implementation
             var categoryModelToRepo = _mapper.Map(categoryUpdateDto, category);
             await _categoriesRepo.SaveChanges();
             return _mapper.Map<CategoryDetailedReadDto>(categoryModelToRepo);
+        }
+
+        public async Task<IEnumerable<CategoryReadDto>> SearchCategories(string searchText)
+        {
+            var products = await _categoriesRepo.SearchByName(searchText);
+            return _mapper.Map<IEnumerable<CategoryReadDto>>(products);
         }
     }
 }

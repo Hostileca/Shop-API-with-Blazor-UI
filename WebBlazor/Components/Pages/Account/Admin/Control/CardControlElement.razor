@@ -1,0 +1,10 @@
+﻿<div class="card shadow-sm">
+    <div class="card-body">
+        <h5 class="card-title">Phone number: @Card.PhoneNumber</h5>
+        <p>Bonuses: @Card.Bonuses</p>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public CardReadDto Card { get; set; }
+}

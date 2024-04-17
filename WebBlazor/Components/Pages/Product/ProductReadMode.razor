@@ -1,0 +1,145 @@
+﻿@rendermode InteractiveServer
+
+<div class="row">
+    <div class="col-md-6">
+        <div id="productCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                @foreach (var imgId in ProductModel.ProductImageIds)
+                {
+                    <div class="carousel-item @(imgId == ProductModel.ProductImageIds.First() ? "active" : "")">
+                        <img src="@($"{UserService.APIConnectionString}/products/images/{imgId}")" class="d-block w-100" alt="@imgId">
+                    </div>
+                }
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <h1>@ProductModel.Name</h1>
+        <p><strong>Category:</strong> @ProductModel.Category.Name</p>
+        <p>
+            <strong>Manufacturer:</strong>
+            <img src="@($"{UserService.APIConnectionString}/manufacturers/images/{ProductModel.Manufacturer.ManufacturerImageId}")"
+                 alt="@ProductModel.Manufacturer.Name" class="manufacturer-icon"
+                 style="max-width: 50px; max-height: 50px;" />
+            @ProductModel.Manufacturer.Name
+        </p>
+        <h3>Attributes:</h3>
+        <ul>
+            @foreach (var attributeElement in ProductModel.Attributes)
+            {
+                <li>@attributeElement.Name: @attributeElement.Value</li>
+            }
+        </ul>
+        <h3>Price history:</h3>
+        @foreach (var price in ProductModel.PriceHistory)
+        {
+            <p>
+                @price.StartDate.ToString("yyyy-MM-dd") -
+                @if (price.EndDate == DateTime.MinValue)
+                {
+                    <text>today</text>
+                }
+                else
+                {
+                    @price.EndDate.ToString("yyyy-MM-dd")
+                }
+                : @price.PriceValue
+            </p>
+        }
+        <h3>Description:</h3>
+        <p>@ProductModel.Description</p>
+        <button type="button" class="btn btn-dark" onclick="@(() => OnInCartClick())">In cart</button>
+    </div>
+</div>
+
+<h3>Product Reviews</h3>
+<div class="row">
+    <div class="col-md-12">
+        @if (ProductModel.Reviews != null && ProductModel.Reviews.Any())
+        {
+            <ul>
+                @foreach (var review in ProductModel.Reviews)
+                {
+                    <li>
+                        @if (review.User.FirstName == null && @review.User.LastName == null)
+                        {
+                            <strong>No name</strong>
+                        }
+                        else
+                        {
+                            <strong>@review.User.FirstName @review.User.LastName</strong>
+                        }
+                        -Rating: @review.Rating
+                        <p>@review.Content</p>
+                    </li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p>No reviews available for this product.</p>
+        }
+    </div>
+</div>
+
+@if (UserService.IsAuthorized)
+{
+    <div class="row mt-5">
+        <div class="col-md-12">
+            <h3>Add a Review</h3>
+            <EditForm OnSubmit="OnReviewSubmit" Model="ReviewCreateDto" FormName="ReviewCreateForm">
+                <div class="form-group">
+                    <label for="rating">Rating:</label>
+                    <InputText type="number" class="form-control" id="rating" min="1" max="5" @bind-Value="ReviewCreateDto.Rating" />
+                </div>
+                <div class="form-group">
+                    <label for="content">Review:</label>
+                    <InputTextArea class="form-control" id="content" rows="3" @bind-Value="ReviewCreateDto.Content"></InputTextArea>
+                </div>
+                <button type="submit" class="btn btn-dark">Submit Review</button>
+            </EditForm>
+        </div>
+    </div>
+}
+else
+{
+    <p>Log in to leave a review.</p>
+}
+
+@code {
+    [Parameter]
+    public ProductDetailedReadDto ProductModel { get; set; }
+    private ReviewCreateDto ReviewCreateDto = new ReviewCreateDto();
+
+    private async Task OnInCartClick()
+    {
+        if (!UserService.IsAuthorized)
+        {
+            NavigationManager.NavigateTo($"/sign-in");
+            return;
+        }
+        var cartElementCreateDto = new CartElementCreateDto()
+            {
+                ProductId = ProductModel.Id,
+                Amount = 1
+            };
+        var response = await UserService.HttpClient.PostAsJsonAsync<CartElementCreateDto>($"{UserService.APIConnectionString}/users/cart", cartElementCreateDto);
+        await MessageService.ShowMessage(response);
+    }
+
+    private async Task OnReviewSubmit()
+    {
+        var response = await UserService.HttpClient.PostAsJsonAsync<ReviewCreateDto>($"{UserService.APIConnectionString}/products/{ProductModel.Id}/reviews", ReviewCreateDto);
+        await MessageService.ShowMessage(response);
+    }
+}
+

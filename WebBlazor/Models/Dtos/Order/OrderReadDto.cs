@@ -6,6 +6,6 @@ namespace WebBlazor.Models.Dtos.Order
     {
         public int Id { get; set; }
         public DateTime Date { get; set; }
-        public List<ProductReadDto> Products { get; set; }
+        public List<OrderProductReadDto> Products { get; set; }
     }
 }

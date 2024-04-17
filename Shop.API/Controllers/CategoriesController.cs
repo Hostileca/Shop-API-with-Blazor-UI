@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Shop.BL.Dtos.Category;
+using Shop.BL.Services.Implementation;
 using Shop.BL.Services.Interfaces;
 
 namespace Shop.API.Controllers
@@ -51,6 +52,13 @@ namespace Shop.API.Controllers
         {
             var category = await _categoriesService.DeleteCategory(categoryId);
             return Ok(category);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchCategories(string searchText)
+        {
+            var categories = await _categoriesService.SearchCategories(searchText);
+            return Ok(categories);
         }
     }
 }

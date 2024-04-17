@@ -9,5 +9,6 @@ namespace Shop.BL.Services.Interfaces
         Task<ManufacturerDetailedReadDto> CreateManufacturer(ManufacturerCreateDto manufacturerCreateDto);
         Task<ManufacturerDetailedReadDto> DeleteManufacturer(int id);
         Task<ManufacturerDetailedReadDto> UpdateManufacturer(int id, ManufacturerUpdateDto manufacturerUpdateDto);
+        Task<IEnumerable<ManufacturerReadDto>> SearchManufacturers(string searchText);
     }
 }

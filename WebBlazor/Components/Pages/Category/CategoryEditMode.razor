@@ -1,0 +1,56 @@
+﻿@rendermode InteractiveServer
+
+<div class="container">
+    <div class="mt-4">
+        <img src="@($"{UserService.APIConnectionString}/categories/images/{CategoryModel.CategoryImageId}")" class="d-block w-100" 
+        style="max-width: 225px" width="225" height="225" alt="@CategoryModel.CategoryImageId">
+        <label for="image" class="form-label">Image file</label>
+        <InputFile type="floatingInput" class="form-control" id="image" placeholder="File" @bind-Value="File" OnChange="HandleFileUpload" />
+        <button type="submit" class="btn btn-dark" onclick="@(() => LoadFile())">Load</button>
+    </div>
+    <div class="mt-4">
+        <label>Name:</label>
+        <InputText class="form-control" @bind-Value="CategoryUpdateDto.Name"></InputText>
+        <button class="btn btn-dark" onclick="@(() => SaveCategoryInfo())">Save</button>
+    </div>
+
+   
+</div>
+
+@code {
+    [Parameter]
+    public CategoryDetailedReadDto CategoryModel { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        CategoryUpdateDto.Name = CategoryModel.Name;
+    }
+
+    private CategoryUpdateDto CategoryUpdateDto = new CategoryUpdateDto();
+    private async Task SaveCategoryInfo()
+    {
+        var response = await UserService.HttpClient.PutAsJsonAsync<CategoryUpdateDto>($"{UserService.APIConnectionString}/categories/{CategoryModel.Id}", CategoryUpdateDto);
+        if (response.IsSuccessStatusCode)
+        {
+            CategoryModel = await response.Content.ReadFromJsonAsync<CategoryDetailedReadDto>();
+        }
+        await MessageService.ShowMessage(response);
+    }
+
+    private IBrowserFile File;
+    private async Task LoadFile()
+    {
+        var content = new MultipartFormDataContent();
+        content.Add(new StreamContent(File.OpenReadStream()), "file", File.Name);
+        var response = await UserService.HttpClient.PostAsync($"{UserService.APIConnectionString}/categories/{CategoryModel.Id}/images", content);
+        if (response.IsSuccessStatusCode)
+        {
+            CategoryModel.CategoryImageId = await response.Content.ReadFromJsonAsync<int>();
+            StateHasChanged();
+        }
+        await MessageService.ShowMessage(response);
+    }
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        File = e.File;
+    }
+}

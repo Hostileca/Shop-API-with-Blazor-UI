@@ -79,6 +79,7 @@ namespace Shop.BL.Services.Implementation
                 throw new KeyNotFoundException($"Attribute not found with id:{attributeId}");
             }
             var productAttributeToRepo = _mapper.Map(attributeUpdateDto, productAttributeFromRepo);
+            await _productAttributesRepo.SaveChanges();
             return _mapper.Map<ProductAttributeReadDto>(productAttributeToRepo);
         }
     }

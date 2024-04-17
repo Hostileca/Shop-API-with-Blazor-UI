@@ -1,0 +1,56 @@
+﻿@rendermode InteractiveServer
+
+<div class="container">
+    <div class="mt-4">
+        <img src="@($"{UserService.APIConnectionString}/manufacturers/images/{ManufacturerModel.ManufacturerImageId}")" class="d-block w-100"
+             style="max-width: 225px" width="225" height="225" alt="@ManufacturerModel.ManufacturerImageId">
+        <label for="image" class="form-label">Image file</label>
+        <InputFile type="floatingInput" class="form-control" id="image" placeholder="File" @bind-Value="File" OnChange="HandleFileUpload" />
+        <button type="submit" class="btn btn-dark" onclick="@(() => LoadFile())">Load</button>
+    </div>
+    <div class="mt-4">
+        <label>Name:</label>
+        <InputText class="form-control" @bind-Value="ManufacturerUpdateDto.Name"></InputText>
+        <button class="btn btn-dark" onclick="@(() => SaveCategoryInfo())">Save</button>
+    </div>
+
+
+</div>
+
+@code {
+    [Parameter]
+    public ManufacturerDetailedReadDto ManufacturerModel { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        ManufacturerUpdateDto.Name = ManufacturerModel.Name;
+    }
+
+    private ManufacturerUpdateDto ManufacturerUpdateDto = new ManufacturerUpdateDto();
+    private async Task SaveCategoryInfo()
+    {
+        var response = await UserService.HttpClient.PutAsJsonAsync<ManufacturerUpdateDto>($"{UserService.APIConnectionString}/manufacturers/{ManufacturerModel.Id}", ManufacturerUpdateDto);
+        if (response.IsSuccessStatusCode)
+        {
+            ManufacturerModel = await response.Content.ReadFromJsonAsync<ManufacturerDetailedReadDto>();
+        }
+        await MessageService.ShowMessage(response);
+    }
+
+    private IBrowserFile File;
+    private async Task LoadFile()
+    {
+        var content = new MultipartFormDataContent();
+        content.Add(new StreamContent(File.OpenReadStream()), "file", File.Name);
+        var response = await UserService.HttpClient.PostAsync($"{UserService.APIConnectionString}/manufacturers/{ManufacturerModel.Id}/images", content);
+        if (response.IsSuccessStatusCode)
+        {
+            ManufacturerModel.ManufacturerImageId = await response.Content.ReadFromJsonAsync<int>();
+            StateHasChanged();
+        }
+        await MessageService.ShowMessage(response);
+    }
+    private async Task HandleFileUpload(InputFileChangeEventArgs e)
+    {
+        File = e.File;
+    }
+}

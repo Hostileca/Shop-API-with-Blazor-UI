@@ -9,5 +9,6 @@ namespace Shop.DAL.Data.Interfaces
         Task AddProduct(Product product);
         void DeleteProduct(Product product);
         Task<Product> GetProductById(int id);
+        Task<IEnumerable<Product>> SearchByName(string searchName);
     }
 }

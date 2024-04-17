@@ -10,5 +10,6 @@ namespace Shop.DAL.Data.Interfaces
         void DeleteManufacturer(Manufacturer manufacturer);
         Task<Manufacturer> GetManufacturerById(int id);
         Task<Manufacturer> GetManufacturerByName(string name);
+        Task<IEnumerable<Manufacturer>> SearchByName(string searchName);
     }
 }

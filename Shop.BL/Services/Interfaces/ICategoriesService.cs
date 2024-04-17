@@ -9,5 +9,6 @@ namespace Shop.BL.Services.Interfaces
         Task<CategoryDetailedReadDto> CreateCategory(CategoryCreateDto categoryCreateDto);
         Task<CategoryDetailedReadDto> DeleteCategory(int id);
         Task<CategoryDetailedReadDto> UpdateCategory(int id, CategoryUpdateDto categoryUpdateDto);
+        Task<IEnumerable<CategoryReadDto>> SearchCategories(string searchText);
     }
 }

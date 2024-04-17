@@ -1,0 +1,26 @@
+﻿@page "/manufacturers"
+@rendermode InteractiveServer
+
+<div class="album py-5 bg-light">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-md-6 g-3">
+
+            @if (manufacturers is not null)
+            {
+                foreach (var manufacturer in manufacturers)
+                {
+                    <WebBlazor.Components.Elements.ManufacturerElement Manufacturer="manufacturer"></WebBlazor.Components.Elements.ManufacturerElement>
+                }
+            }
+
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<ManufacturerReadDto> manufacturers;
+    protected override async Task OnInitializedAsync()
+    {
+        manufacturers = await UserService.HttpClient.GetFromJsonAsync<List<ManufacturerReadDto>>($"{UserService.APIConnectionString}/manufacturers");
+    }
+}

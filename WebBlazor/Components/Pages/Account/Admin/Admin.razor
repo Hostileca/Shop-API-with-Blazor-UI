@@ -1,0 +1,121 @@
+﻿@page "/admin"
+@rendermode InteractiveServer
+
+<link href="Account.css" rel="stylesheet" />
+<div class="container container-main">
+    <div class="row">
+        <h1>All orders</h1>
+        <div class="col-md-10">
+            <div class="album py-5 bg-light">
+                <div class="container">
+                    <div class="row row-cols-1 row-cols-md-4 g-3">
+                        @if (OrdersList is not null)
+                        {
+                            if(OrdersList.Count == 0)
+                            {
+                                <text><p>No orders</p></text>
+                            }
+                            foreach (var order in OrdersList)
+                            {
+                                <div class="col">
+                                    <WebBlazor.Components.Pages.Account.Admin.Control.OrderControlElement Order="order"></WebBlazor.Components.Pages.Account.Admin.Control.OrderControlElement>
+                                    <button class="btn btn-danger" onclick="@(() => RemoveOrder(order))">Remove</button>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+
+        <h1>All cards</h1>
+        <div class="col-md-10">
+            <div class="album py-5 bg-light">
+                <div class="container">
+                    <div class="row row-cols-1 row-cols-md-4 g-3">
+                        @if (OrdersList is not null)
+                        {
+                            if (OrdersList.Count == 0)
+                            {
+                                <text><p>No cards</p></text>
+                            }
+                            foreach (var card in CardsList)
+                            {
+                                <WebBlazor.Components.Pages.Account.Admin.Control.CardControlElement Card="card"></WebBlazor.Components.Pages.Account.Admin.Control.CardControlElement>
+                                <button class="btn btn-danger" onclick="@(() => RemoveCard(card))">Remove</button>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="container mt-5">
+            <h2 class="mb-4">Create card</h2>
+            <div class="mb-3">
+                <label for="phoneNumber" class="form-label">Phone number</label>
+                <InputText type="floatingInput" class="form-control" id="phoneNumber" placeholder="Phone number" @bind-Value="CardCreateDto.PhoneNumber" />
+            </div>
+            <button type="submit" class="btn btn-dark" onclick="@(() => CreateBuyerCard())">Create</button>
+        </div>
+
+    </div>
+</div>
+
+
+@code{
+    private List<OrderReadDto> OrdersList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!UserService.IsAuthorized)
+        {
+            NavigationManager.NavigateTo("/sign-in");
+            return;
+        }
+        else if (!UserService.IsTokenHasRole(Roles.root))
+        {
+            NavigationManager.NavigateTo("/account");
+            return;
+        }
+        OrdersList = await UserService.HttpClient.GetFromJsonAsync<List<OrderReadDto>>($"{UserService.APIConnectionString}/orders");
+        CardsList = await UserService.HttpClient.GetFromJsonAsync<List<CardReadDto>>($"{UserService.APIConnectionString}/buyer-cards");
+    }
+
+
+    private async Task RemoveOrder(OrderReadDto order)
+    {
+        var response = await UserService.HttpClient.DeleteAsync($"{UserService.APIConnectionString}/orders/{order.Id}");
+        if (response.IsSuccessStatusCode)
+        {
+            OrdersList.Remove(order);
+            StateHasChanged();
+        }
+        await MessageService.ShowMessage(response);
+    }
+
+    private List<CardReadDto> CardsList;
+    private CardCreateDto? CardCreateDto { get; set; } = new CardCreateDto();
+    private async Task CreateBuyerCard()
+    {
+        var response = await UserService.HttpClient.PostAsJsonAsync<CardCreateDto>($"{UserService.APIConnectionString}/buyer-cards", CardCreateDto);
+        await MessageService.ShowMessage(response);
+        if (response.IsSuccessStatusCode)
+        {
+            CardsList.Add(await response.Content.ReadFromJsonAsync<CardReadDto>());
+        }
+        StateHasChanged();
+    }
+
+    private async Task RemoveCard(CardReadDto card)
+    {
+        var response = await UserService.HttpClient.DeleteAsync($"{UserService.APIConnectionString}/buyer-cards/{card.Id}");
+        if (response.IsSuccessStatusCode)
+        {
+            CardsList.Remove(card);
+            StateHasChanged();
+        }
+        await MessageService.ShowMessage(response);
+    }
+}

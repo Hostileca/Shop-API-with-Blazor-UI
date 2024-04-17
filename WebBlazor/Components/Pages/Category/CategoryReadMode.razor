@@ -1,28 +1,27 @@
-﻿@page "/categories/{categoryId}"
-@rendermode InteractiveServer
+﻿@rendermode InteractiveServer
 
 <div class="album py-5 bg-light">
     <div class="container">
         <div class="row row-cols-1 row-cols-md-5 g-3">
-
-            @if (CategoryModel is not null && CategoryModel.Products is not null)
+            @if (CategoryModel is not null)
             {
+                if(CategoryModel.Products.Count == 0)
+                {
+                    <p>No products</p>    
+                }
                 foreach (var product in CategoryModel.Products)
                 {
                     <WebBlazor.Components.Elements.ProductElement ProductModel="product"></WebBlazor.Components.Elements.ProductElement>
                 }
             }
-
         </div>
     </div>
 </div>
 
 @code {
     [Parameter]
-    public string categoryId { get; set; }
-    private CategoryDetailedReadDto CategoryModel;
+    public CategoryDetailedReadDto CategoryModel { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        CategoryModel = await UserService.HttpClient.GetFromJsonAsync<CategoryDetailedReadDto>($"{UserService.APIConnectionString}/categories/{categoryId}");
     }
 }

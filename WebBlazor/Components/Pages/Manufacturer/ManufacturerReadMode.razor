@@ -1,0 +1,27 @@
+﻿@rendermode InteractiveServer
+
+<div class="album py-5 bg-light">
+    <div class="container">
+        <div class="row row-cols-1 row-cols-md-5 g-3">
+            @if(ManufacturerModel.Products.Count==0)
+            {
+                <p>No products</p>    
+            }
+            @if (ManufacturerModel is not null)
+            {
+                foreach (var product in ManufacturerModel.Products)
+                {
+                    <WebBlazor.Components.Elements.ProductElement ProductModel="product"></WebBlazor.Components.Elements.ProductElement>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public ManufacturerDetailedReadDto ManufacturerModel { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+    }
+}
