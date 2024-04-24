@@ -4,7 +4,7 @@
 <div class="container mt-5">
     @if (ProductModel != null)
     {
-        @switch (Mode)
+        @switch (ProductMode)
         {
             case Modes.Read:
                 <ProductReadMode ProductModel="ProductModel"></ProductReadMode>
@@ -33,7 +33,7 @@
 @code {
     [Parameter]
     public string productId { get; set; }
-    private Modes Mode = Modes.Read;
+    private Modes ProductMode = Modes.Read;
 
     public ProductDetailedReadDto ProductModel { get; set; }
     protected override async Task OnInitializedAsync()
@@ -43,22 +43,23 @@
 
     private void SwitchMode()
     {
-        switch (Mode)
+        switch (ProductMode)
         {
             case Modes.Read:
-                Mode = Modes.Edit;
+                ProductMode = Modes.Edit;
                 break;
             case Modes.Edit:
-                Mode = Modes.Read;
+                ProductMode = Modes.Read;
                 break;
             default:
+                ProductMode = Modes.Read;
                 break;
         }
     }
 
     private Modes GetNextMode()
     {
-        switch (Mode)
+        switch (ProductMode)
         {
             case Modes.Read:
                 return Modes.Edit;

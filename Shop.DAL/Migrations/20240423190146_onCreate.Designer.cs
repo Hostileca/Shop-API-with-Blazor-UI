@@ -12,7 +12,7 @@ using Shop.DAL.Data;
 namespace Shop.DAL.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240305093107_onCreate")]
+    [Migration("20240423190146_onCreate")]
     partial class onCreate
     {
         /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace Shop.DAL.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.1")
+                .HasAnnotation("ProductVersion", "8.0.4")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);

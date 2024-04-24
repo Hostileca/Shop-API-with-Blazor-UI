@@ -21,6 +21,12 @@ namespace Shop.API.Controllers
             var products = await _productsService.GetAllProducts();
             return Ok(products);
         }
+        [HttpGet("top-10")]
+        public async Task<IActionResult> GetTop10Products()
+        {
+            var products = await _productsService.GetTop10Products();
+            return Ok(products);
+        }
 
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById(int id)

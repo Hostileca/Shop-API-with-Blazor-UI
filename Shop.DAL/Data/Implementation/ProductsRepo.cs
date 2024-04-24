@@ -28,7 +28,7 @@ namespace Shop.DAL.Data.Implementation
                                             .Include(p => p.PriceHistory)
                                             .Include(p => p.Category)
                                             .Include(p => p.OrderProduct)
-                                            .Include(p => p.Manufacturer).ThenInclude(m => m.Image)
+                                            .Include(p => p.Manufacturer)
                                             .Include(p => p.ProductAttributes).ThenInclude(pa => pa.Attribute)
                                             .Include(p => p.Images)
                                             .ToListAsync();
@@ -38,12 +38,29 @@ namespace Shop.DAL.Data.Implementation
         {
             return await _dbContext.Products.Include(p => p.Reviews).ThenInclude(r => r.User)
                                             .Include(p => p.PriceHistory)
-                                            .Include(p => p.Category)
+                                            .Include(p => p.Category).ThenInclude(c => c.Image)
                                             .Include(p => p.OrderProduct)
                                             .Include(p => p.Manufacturer).ThenInclude(m => m.Image)
                                             .Include(p => p.ProductAttributes).ThenInclude(pa => pa.Attribute)
                                             .Include(p => p.Images)
                                             .FirstOrDefaultAsync(p => p.Id == id);
+        }
+
+        public async Task<IEnumerable<Product>> GetTop10Products()
+        {
+            var topProducts = await _dbContext.Products
+                                            .Include(p => p.Reviews).ThenInclude(r => r.User)
+                                            .Include(p => p.PriceHistory)
+                                            .Include(p => p.Category)
+                                            .Include(p => p.OrderProduct)
+                                            .Include(p => p.Manufacturer)
+                                            .Include(p => p.ProductAttributes).ThenInclude(pa => pa.Attribute)
+                                            .Include(p => p.Images)
+                                            .Where(p => p.Reviews.Any()) 
+                                            .OrderByDescending(p => p.Reviews.Average(r => r.Rating) * Math.Log(p.Reviews.Count)) 
+                                            .Take(10)
+                                            .ToListAsync();
+            return topProducts;
         }
 
         public async Task SaveChanges()

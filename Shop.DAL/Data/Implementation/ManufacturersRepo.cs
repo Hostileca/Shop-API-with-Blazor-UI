@@ -32,7 +32,9 @@ namespace Shop.DAL.Data.Implementation
         public async Task<Manufacturer> GetManufacturerById(int id)
         {
             return await _dbContext.Manufacturers.Include(m => m.Products).ThenInclude(p => p.Category)
-                .Include(m => m.Image)
+                                                 .Include(c => c.Products).ThenInclude(p => p.Images)
+                                                 .Include(c => c.Products).ThenInclude(p => p.PriceHistory)
+                                                 .Include(m => m.Image)
                                                  .FirstOrDefaultAsync(p => p.Id == id);
         }
 
@@ -40,6 +42,8 @@ namespace Shop.DAL.Data.Implementation
         {
             return await _dbContext.Manufacturers.Include(m => m.Products).ThenInclude(p => p.Category)
                 .Include(m => m.Image)
+                .Include(c => c.Products).ThenInclude(p => p.Images)
+                                              .Include(c => c.Products).ThenInclude(p => p.PriceHistory)
                                                  .FirstOrDefaultAsync(p => p.Name == name);
         }
 

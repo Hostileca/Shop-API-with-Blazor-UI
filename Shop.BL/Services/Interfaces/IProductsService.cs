@@ -5,6 +5,7 @@ namespace Shop.BL.Services.Interfaces
     public interface IProductsService
     {
         Task<IEnumerable<ProductReadDto>> GetAllProducts();
+        Task<IEnumerable<ProductReadDto>> GetTop10Products();
         Task<ProductDetailedReadDto> GetProductById(int id);
         Task<ProductDetailedReadDto> CreateProduct(ProductCreateDto productCreateDto);
         Task<ProductDetailedReadDto> DeleteProduct(int id);

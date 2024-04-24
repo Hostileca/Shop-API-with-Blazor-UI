@@ -31,14 +31,16 @@ namespace Shop.DAL.Data.Implementation
 
         public async Task<Category> GetCategoryById(int id)
         {
-            return await _dbContext.Categories.Include(c => c.Products)
+            return await _dbContext.Categories.Include(c => c.Products).ThenInclude(p => p.Images)
+                                              .Include(c => c.Products).ThenInclude(p => p.PriceHistory)
                                               .Include(c => c.Image)
                                               .FirstOrDefaultAsync(p => p.Id == id);
         }
 
         public async Task<Category> GetCategoryByName(string name)
         {
-            return await _dbContext.Categories.Include(c => c.Products)
+            return await _dbContext.Categories.Include(c => c.Products).ThenInclude(p => p.Images)
+                                              .Include(c => c.Products).ThenInclude(p => p.PriceHistory)
                                               .Include(c => c.Image)
                                                .FirstOrDefaultAsync(p => p.Name == name);
         }

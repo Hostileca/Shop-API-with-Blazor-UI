@@ -6,6 +6,7 @@ namespace Shop.DAL.Data.Interfaces
     {
         Task SaveChanges();
         Task<IEnumerable<Product>> GetAllProducts();
+        Task<IEnumerable<Product>> GetTop10Products();
         Task AddProduct(Product product);
         void DeleteProduct(Product product);
         Task<Product> GetProductById(int id);

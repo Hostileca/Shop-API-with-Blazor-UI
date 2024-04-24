@@ -112,5 +112,11 @@ namespace Shop.BL.Services.Implementation
             var products = await _productRepo.SearchByName(searchText);
             return _mapper.Map<IEnumerable<ProductReadDto>>(products);
         }
+
+        public async Task<IEnumerable<ProductReadDto>> GetTop10Products()
+        {
+            var products = await _productRepo.GetTop10Products();
+            return _mapper.Map<IEnumerable<ProductReadDto>>(products);
+        }
     }
 }
